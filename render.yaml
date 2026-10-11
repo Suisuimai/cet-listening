@@ -4,7 +4,7 @@ services:
     runtime: python
     plan: free
     region: oregon          # 可选：singapore / oregon / frankfurt
-    branch: master
+    branch: main
     buildCommand: "echo skip-build"
     startCommand: "python server.py"
     healthCheckPath: "/cet6/"
