@@ -45,8 +45,9 @@ class ListeningHandler(SimpleHTTPRequestHandler):
         if self.is_root_request(parsed.path):
             self.serve_root_redirect()
             return
-        if SUPABASE_AUDIO_BASE and parsed.path.startswith("/audio/"):
-            self.redirect_to_supabase(parsed.path)
+        audio_path = self.strip_exam_prefix(parsed.path)
+        if SUPABASE_AUDIO_BASE and audio_path.startswith("/audio/"):
+            self.redirect_to_supabase(audio_path)
             return
         if self.is_app_entry(parsed.path):
             self.serve_index()
@@ -66,8 +67,9 @@ class ListeningHandler(SimpleHTTPRequestHandler):
         if self.is_root_request(parsed.path):
             self.serve_root_redirect()
             return
-        if SUPABASE_AUDIO_BASE and parsed.path.startswith("/audio/"):
-            self.redirect_to_supabase(parsed.path)
+        audio_path = self.strip_exam_prefix(parsed.path)
+        if SUPABASE_AUDIO_BASE and audio_path.startswith("/audio/"):
+            self.redirect_to_supabase(audio_path)
             return
         if self.is_app_entry(parsed.path):
             self.serve_index(head_only=True)
