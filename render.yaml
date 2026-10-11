@@ -1,0 +1,17 @@
+services:
+  - type: web
+    name: cet-listening
+    runtime: python
+    plan: free
+    region: oregon          # 可选：singapore / oregon / frankfurt
+    branch: master
+    buildCommand: "echo skip-build"
+    startCommand: "python server.py"
+    healthCheckPath: "/cet6/"
+    envVars:
+      - key: PORT
+        sync: false          # Render 自动注入，无需手动填
+      - key: SUPABASE_AUDIO_BASE
+        sync: false          # 在 Render 后台 → Environment 里手动填（见 DEPLOY.md）
+      - key: ALLOW_REMOTE_ADMIN
+        value: "0"           # 公网部署务必保持 0，禁止外人访问管理页

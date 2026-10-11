@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-labelledby="title">
+  <title>CET Icon</title>
+  <defs>
+    <linearGradient id="bg" x1="8" x2="56" y1="6" y2="58" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#18a08f" />
+      <stop offset="1" stop-color="#095f58" />
+    </linearGradient>
+  </defs>
+  <!-- 背景 -->
+  <rect width="64" height="64" rx="16" fill="url(#bg)" />
+  
+  <!-- 内衬框 -->
+  <path
+    d="M18 17.5c-1.9 0-3.5 1.6-3.5 3.5v22c0 1.9 1.6 3.5 3.5 3.5h28.5c1.9 0 3.5-1.6 3.5-3.5V21c0-1.9-1.6-3.5-3.5-3.5H18z"
+    fill="none"
+    opacity=".18"
+    stroke="#dff3ef"
+    stroke-width="2"
+  />
+  
+  <!-- 缩小并居中的 CET 文字路径 (缩放比例 0.8，基于中心点 32, 32 重新计算) -->
+  <path
+    d="
+      M 26.4 25.6 H 23.2 A 5.2 5.2 0 0 0 18 30.8 V 33.2 A 5.2 5.2 0 0 0 23.2 38.4 H 26.4 V 35.6 H 23.2 A 2.4 2.4 0 0 1 20.8 33.2 V 30.8 A 2.4 2.4 0 0 1 23.2 28.4 H 26.4 Z 
+      M 28.8 25.6 H 35.6 V 28.4 H 31.6 V 30.6 H 34.8 V 33.4 H 31.6 V 35.6 H 35.6 V 38.4 H 28.8 Z 
+      M 38 25.6 H 46 V 28.4 H 43.4 V 38.4 H 40.6 V 28.4 H 38 Z
+    "
+    fill="#f8fffd"
+  />
+</svg>
