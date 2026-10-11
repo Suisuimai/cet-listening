@@ -65,6 +65,7 @@ button:active {
     var(--left-sidebar-width) var(--resizer-width) minmax(0, 1fr)
     var(--resizer-width) var(--right-sidebar-width);
   height: 100vh;
+  height: 100dvh;
   overflow: hidden;
 }
 
@@ -99,16 +100,27 @@ button:active {
   border-left: 1px solid var(--line);
 }
 
-.shell.left-collapsed .catalog,
-.shell.right-collapsed .details {
-  overflow: hidden;
-  padding: 0;
-  border: 0;
+@media (min-width: 1025px) {
+  .shell.left-collapsed .catalog,
+  .shell.right-collapsed .details {
+    overflow: hidden;
+    padding: 0;
+    border: 0;
+  }
+
+  .shell.left-collapsed .catalog > *,
+  .shell.right-collapsed .details > * {
+    display: none;
+  }
 }
 
-.shell.left-collapsed .catalog > *,
-.shell.right-collapsed .details > * {
+.mobile-bar,
+.drawer-backdrop {
   display: none;
+}
+
+.view-options {
+  display: contents;
 }
 
 .player {
@@ -910,138 +922,372 @@ body.resizing {
   text-align: center;
 }
 
-@media (max-width: 860px) {
-  body {
-    --sb-track-color: #dde5e8;
-    --sb-thumb-color: #6baf8d;
-    --sb-size: 9px;
-    overflow: auto;
+/* Keep the floating player inside the transcript column on narrow desktops / iPad landscape. */
+@media (min-width: 1025px) and (max-width: 1440px) {
+  :root {
+    --left-sidebar-width: 240px;
+    --right-sidebar-width: 260px;
   }
 
-  body::-webkit-scrollbar {
-    width: var(--sb-size);
+  .now-playing {
+    left: calc(
+      var(--left-sidebar-width) + var(--resizer-width) +
+        (
+          100vw - var(--left-sidebar-width) - var(--right-sidebar-width) - 2 *
+            var(--resizer-width)
+        ) / 2
+    );
+    bottom: calc(24px + env(safe-area-inset-bottom));
+    width: calc(
+      100vw - var(--left-sidebar-width) - var(--right-sidebar-width) - 2 *
+        var(--resizer-width) - 32px
+    );
+    padding: 20px 48px 14px 18px;
   }
 
-  body::-webkit-scrollbar-track {
-    background: var(--sb-track-color);
-    border-radius: 7px;
+  .workspace {
+    padding-right: 20px;
+    padding-left: 20px;
   }
 
-  body::-webkit-scrollbar-thumb {
-    background: var(--sb-thumb-color);
-    border-radius: 7px;
+  .line {
+    grid-template-columns: 56px minmax(0, 1fr) 76px;
+    gap: 12px;
   }
+}
 
-  @supports not selector(::-webkit-scrollbar) {
-    body {
-      scrollbar-color: var(--sb-thumb-color) var(--sb-track-color);
-      scrollbar-width: thin;
-    }
-  }
-
+/* Tablet portrait & phones: transcript first, sidebars become drawers, player docks to the bottom. */
+@media (max-width: 1024px) {
   .shell {
-    grid-template-columns: 1fr;
-    height: auto;
-    min-height: 100vh;
-    overflow: visible;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .mobile-bar {
+    position: relative;
+    z-index: 20;
+    flex: 0 0 auto;
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 10px;
+    min-height: calc(52px + env(safe-area-inset-top));
+    padding: env(safe-area-inset-top) max(12px, env(safe-area-inset-right)) 0
+      max(12px, env(safe-area-inset-left));
+    border-bottom: 1px solid var(--line);
+    background: rgba(251, 252, 253, 0.96);
+    backdrop-filter: blur(12px);
+  }
+
+  .mobile-bar-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    height: 36px;
+    padding: 0 12px;
+    border-radius: 8px;
+    color: var(--accent-strong);
+    font-size: 14px;
+    font-weight: 800;
+    white-space: nowrap;
+  }
+
+  .mobile-bar-icon {
+    font-size: 15px;
+    line-height: 1;
+  }
+
+  .mobile-track-name {
+    overflow: hidden;
+    color: var(--text);
+    font-size: 15px;
+    text-align: center;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .drawer-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 30;
+    display: block;
+    background: rgba(15, 25, 32, 0.38);
+  }
+
+  .drawer-backdrop[hidden] {
+    display: none;
   }
 
   .catalog,
   .details {
-    position: static;
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    z-index: 40;
+    width: min(86vw, 360px);
     height: auto;
-    padding: 16px;
+    padding: calc(18px + env(safe-area-inset-top)) 18px
+      calc(18px + env(safe-area-inset-bottom));
+    visibility: hidden;
+    box-shadow: 0 0 40px rgba(19, 35, 46, 0.2);
+    transition:
+      transform 240ms ease,
+      visibility 0s linear 240ms;
   }
 
   .catalog {
-    border-right: 0;
-    border-bottom: 1px solid var(--line);
+    left: 0;
+    padding-left: max(18px, env(safe-area-inset-left));
+    transform: translateX(-105%);
   }
 
   .details {
-    order: 2;
-    border-left: 0;
-    border-top: 1px solid var(--line);
-    border-bottom: 1px solid var(--line);
+    right: 0;
+    padding-right: max(18px, env(safe-area-inset-right));
+    transform: translateX(105%);
+    overscroll-behavior: contain;
   }
 
-  .player {
-    order: 3;
-    height: auto;
-    overflow: visible;
-  }
-
-  .now-playing {
-    left: 12px;
-    right: 12px;
-    bottom: 12px;
-    width: auto;
-    padding: 34px 12px 12px;
+  .shell.drawer-left-open .catalog,
+  .shell.drawer-right-open .details {
+    visibility: visible;
     transform: none;
-  }
-
-  .workspace {
-    overflow: visible;
+    transition:
+      transform 240ms ease,
+      visibility 0s;
   }
 
   .track-list {
-    max-height: 260px;
-    margin: -16px;
-    overflow: auto;
+    margin-bottom: calc(-18px - env(safe-area-inset-bottom));
+    padding-bottom: env(safe-area-inset-bottom);
+    overscroll-behavior: contain;
+  }
+
+  .track-list-item {
+    min-height: 54px;
   }
 
   .resizer,
   .restore-sidebar,
-  .side-header {
+  .pin-player {
     display: none !important;
   }
 
-  .section-nav {
-    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-  }
-
-  .now-playing {
-    padding: 16px;
+  .player {
+    display: flex;
+    flex: 1 1 auto;
+    flex-direction: column;
+    justify-content: flex-end;
+    height: auto;
+    min-height: 0;
   }
 
   .workspace {
-    padding: 16px 12px 210px;
+    flex: 1 1 auto;
+    padding: 12px max(16px, env(safe-area-inset-right)) 24px
+      max(16px, env(safe-area-inset-left));
+    -webkit-overflow-scrolling: touch;
   }
 
-  .line {
-    grid-template-columns: 52px minmax(0, 1fr) 72px;
+  /* !important overrides any drag position saved on desktop and applied inline. */
+  .now-playing {
+    position: relative !important;
+    top: auto !important;
+    right: auto !important;
+    bottom: auto !important;
+    left: auto !important;
+    order: 2;
+    flex: 0 0 auto;
     gap: 10px;
-    padding: 12px;
+    width: auto;
+    padding: 12px max(16px, env(safe-area-inset-right))
+      calc(12px + env(safe-area-inset-bottom))
+      max(16px, env(safe-area-inset-left));
+    border-width: 1px 0 0;
+    border-radius: 0;
+    box-shadow: 0 -8px 30px rgba(19, 35, 46, 0.08);
+    cursor: default;
+    transform: none !important;
   }
 
-  .line-text {
-    font-size: 16px;
+  .progress-row {
+    grid-template-columns: 46px minmax(0, 1fr) 46px;
+    gap: 10px;
+  }
+
+  .progress-row span:last-child {
+    text-align: right;
+  }
+
+  .controls {
+    gap: 8px 10px;
+  }
+
+  .view-options {
+    display: flex;
+    align-items: center;
+    gap: 14px;
   }
 
   .section-heading {
-    top: 0;
+    font-size: 16px;
   }
 }
 
-@media (max-width: 520px) {
+@media (max-width: 600px) {
+  .mobile-bar-btn {
+    padding: 0 10px;
+  }
+
   .progress-row {
-    grid-template-columns: 42px minmax(0, 1fr) 42px;
+    grid-template-columns: 40px minmax(0, 1fr) 40px;
     gap: 8px;
     font-size: 12px;
   }
 
   .controls {
     display: grid;
-    grid-template-columns: 46px minmax(80px, 1fr) 46px;
+    grid-template-columns: 44px minmax(0, 1fr) 44px auto;
+    gap: 8px;
   }
 
-  .segmented,
-  .toggle,
-  .switch-control {
-    grid-column: 1 / -1;
+  .icon-btn {
+    width: 44px;
+  }
+
+  .play-btn {
+    min-width: 0;
+    padding: 0 10px;
+  }
+
+  .icon-btn,
+  .play-btn,
+  .segmented button {
+    min-height: 42px;
   }
 
   .segmented {
-    width: 100%;
+    grid-template-columns: repeat(3, minmax(44px, 1fr));
+  }
+
+  .segmented button {
+    padding: 0 4px;
+    font-size: 13px;
+  }
+
+  .view-options {
+    grid-column: 1 / -1;
+    justify-content: space-between;
+    gap: 8px;
+    font-size: 13px;
+  }
+
+  .toggle,
+  .switch-control {
+    min-height: 30px;
+    gap: 6px;
+  }
+
+  .switch-track {
+    flex-basis: 36px;
+    width: 36px;
+    height: 20px;
+  }
+
+  .switch-track::after {
+    width: 14px;
+    height: 14px;
+  }
+
+  .switch-control input:checked + .switch-track::after {
+    transform: translateX(16px);
+  }
+
+  .workspace {
+    padding-top: 8px;
+    padding-right: max(10px, env(safe-area-inset-right));
+    padding-left: max(10px, env(safe-area-inset-left));
+  }
+
+  .line {
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-areas:
+      "time actions"
+      "text text";
+    gap: 2px 8px;
+    min-height: 0;
+    padding: 8px 12px 10px;
+  }
+
+  .line-time {
+    grid-area: time;
+    align-self: center;
+  }
+
+  .line-text {
+    grid-area: text;
+    font-size: 17px;
+    line-height: 1.55;
+  }
+
+  .line-translation {
+    font-size: 14px;
+  }
+
+  .line-actions {
+    grid-area: actions;
+    min-width: 0;
+  }
+
+  .line-play {
+    width: 30px;
+    min-width: 30px;
+    height: 28px;
+    min-height: 28px;
+  }
+}
+
+/* Short landscape phones: keep the docked player as small as possible. */
+@media (max-width: 1024px) and (max-height: 500px) {
+  .mobile-bar {
+    min-height: calc(44px + env(safe-area-inset-top));
+  }
+
+  .now-playing {
+    gap: 6px;
+    padding-top: 8px;
+    padding-bottom: calc(8px + env(safe-area-inset-bottom));
+  }
+
+  .icon-btn,
+  .play-btn,
+  .segmented button,
+  .toggle,
+  .switch-control {
+    min-height: 34px;
+  }
+}
+
+/* Touch screens have no hover, so the per-line play/loop buttons must stay visible. */
+@media (hover: none) {
+  .line-play {
+    opacity: 1;
+    pointer-events: auto;
+    transform: none;
+  }
+
+  .line:not(.active):not(.looping) .line-play:not(.active) {
+    border-color: #d3dde2;
+    color: #5f8f88;
+  }
+
+  .line:hover {
+    border-color: transparent;
+    background: transparent;
+  }
+
+  .line.active:hover {
+    border-color: #a7d6ce;
+    background: var(--panel);
   }
 }

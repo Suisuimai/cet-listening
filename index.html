@@ -4,7 +4,11 @@
     <meta charset="utf-8" />
     <meta
       name="viewport"
-      content="width=device-width, initial-scale=1"
+      content="width=device-width, initial-scale=1, viewport-fit=cover"
+    />
+    <meta
+      name="theme-color"
+      content="#fbfcfd"
     />
     <title>CET听力播放器</title>
     <link
@@ -26,6 +30,38 @@
       class="shell"
       id="shell"
     >
+      <header class="mobile-bar">
+        <button
+          id="openCatalog"
+          class="mobile-bar-btn"
+          type="button"
+          aria-label="打开听力列表"
+        >
+          <span
+            class="mobile-bar-icon"
+            aria-hidden="true"
+          >☰</span>
+          列表
+        </button>
+        <strong
+          id="mobileTrackName"
+          class="mobile-track-name"
+        >CET听力</strong>
+        <button
+          id="openDetails"
+          class="mobile-bar-btn"
+          type="button"
+          aria-label="打开段落导航"
+        >
+          段落
+        </button>
+      </header>
+      <div
+        id="drawerBackdrop"
+        class="drawer-backdrop"
+        hidden
+      ></div>
+
       <aside
         class="catalog"
         aria-label="听力列表"
@@ -196,43 +232,45 @@
               </button>
             </div>
 
-            <label class="toggle">
-              <input
-                id="autoScroll"
-                type="checkbox"
-                checked
-              />
-              <span>自动滚动</span>
-            </label>
+            <div class="view-options">
+              <label class="toggle">
+                <input
+                  id="autoScroll"
+                  type="checkbox"
+                  checked
+                />
+                <span>自动滚动</span>
+              </label>
 
-            <label class="switch-control">
-              <input
-                id="transcriptVisible"
-                type="checkbox"
-                role="switch"
-                checked
-                aria-label="显示听力原文"
-              />
-              <span
-                class="switch-track"
-                aria-hidden="true"
-              ></span>
-              <span>显示原文</span>
-            </label>
+              <label class="switch-control">
+                <input
+                  id="transcriptVisible"
+                  type="checkbox"
+                  role="switch"
+                  checked
+                  aria-label="显示听力原文"
+                />
+                <span
+                  class="switch-track"
+                  aria-hidden="true"
+                ></span>
+                <span>显示原文</span>
+              </label>
 
-            <label class="switch-control">
-              <input
-                id="translationVisible"
-                type="checkbox"
-                role="switch"
-                aria-label="显示中文翻译"
-              />
-              <span
-                class="switch-track"
-                aria-hidden="true"
-              ></span>
-              <span>显示翻译</span>
-            </label>
+              <label class="switch-control">
+                <input
+                  id="translationVisible"
+                  type="checkbox"
+                  role="switch"
+                  aria-label="显示中文翻译"
+                />
+                <span
+                  class="switch-track"
+                  aria-hidden="true"
+                ></span>
+                <span>显示翻译</span>
+              </label>
+            </div>
           </div>
 
           <audio
