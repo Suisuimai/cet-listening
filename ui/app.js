@@ -61,7 +61,14 @@ const els = {
   showRightSidebar: document.querySelector("#showRightSidebar"),
   leftResizer: document.querySelector("#leftResizer"),
   rightResizer: document.querySelector("#rightResizer"),
+  openCatalog: document.querySelector("#openCatalog"),
+  openDetails: document.querySelector("#openDetails"),
+  drawerBackdrop: document.querySelector("#drawerBackdrop"),
+  mobileTrackName: document.querySelector("#mobileTrackName"),
 };
+
+// Must match the `max-width: 1024px` breakpoint in styles.css.
+const compactLayoutQuery = window.matchMedia("(max-width: 1024px)");
 
 init();
 
@@ -120,6 +127,9 @@ async function switchTrack(
   state.pendingTrackRestore = createPendingTrackRestore(track.id, track.exam);
   resetPlaybackState();
   els.trackName.textContent = track.title;
+  if (els.mobileTrackName) {
+    els.mobileTrackName.textContent = track.title;
+  }
   els.audio.src = encodeURI(track.audio);
   els.audio.load();
 
@@ -201,6 +211,7 @@ function renderTrackList() {
 
     button.addEventListener("click", () => {
       if (track.available || confirm("该听力暂无对齐时间轴，是否尝试打开？")) {
+        closeDrawers();
         switchTrack(track.id, true, track.exam);
       }
     });
@@ -932,6 +943,7 @@ function bindFloatingPlayer() {
   els.nowPlaying.addEventListener("pointerdown", (event) => {
     if (
       state.playerPinned ||
+      compactLayoutQuery.matches ||
       event.button !== 0 ||
       event.target.closest("button, input, label")
     ) {
@@ -971,7 +983,7 @@ function bindFloatingPlayer() {
 }
 
 function restorePlayerPosition() {
-  if (!els.nowPlaying) return;
+  if (!els.nowPlaying || compactLayoutQuery.matches) return;
 
   const savedPosition = localStorage.getItem(PLAYER_POSITION_KEY);
   if (!savedPosition) return;
@@ -1038,21 +1050,61 @@ function setPlayerPinned(pinned, persist = true) {
 }
 
 function bindLayoutEvents() {
-  els.hideLeftSidebar?.addEventListener("click", () =>
-    setSidebarCollapsed("left", true),
-  );
+  els.hideLeftSidebar?.addEventListener("click", () => {
+    if (compactLayoutQuery.matches) {
+      closeDrawers();
+    } else {
+      setSidebarCollapsed("left", true);
+    }
+  });
   els.showLeftSidebar?.addEventListener("click", () =>
     setSidebarCollapsed("left", false),
   );
-  els.hideRightSidebar?.addEventListener("click", () =>
-    setSidebarCollapsed("right", true),
-  );
+  els.hideRightSidebar?.addEventListener("click", () => {
+    if (compactLayoutQuery.matches) {
+      closeDrawers();
+    } else {
+      setSidebarCollapsed("right", true);
+    }
+  });
   els.showRightSidebar?.addEventListener("click", () =>
     setSidebarCollapsed("right", false),
   );
+  els.openCatalog?.addEventListener("click", () => openDrawer("left"));
+  els.openDetails?.addEventListener("click", () => openDrawer("right"));
+  els.drawerBackdrop?.addEventListener("click", closeDrawers);
+  window.addEventListener("keydown", (event) => {
+    if (event.key === "Escape") closeDrawers();
+  });
+  compactLayoutQuery.addEventListener("change", handleCompactLayoutChange);
 
   bindSidebarResizer(els.leftResizer, "left");
   bindSidebarResizer(els.rightResizer, "right");
+}
+
+function openDrawer(side) {
+  if (!els.shell || !compactLayoutQuery.matches) return;
+  els.shell.classList.toggle("drawer-left-open", side === "left");
+  els.shell.classList.toggle("drawer-right-open", side === "right");
+  if (els.drawerBackdrop) els.drawerBackdrop.hidden = false;
+  if (side === "left") ensureActiveTrackListItemVisible();
+}
+
+function closeDrawers() {
+  els.shell?.classList.remove("drawer-left-open", "drawer-right-open");
+  if (els.drawerBackdrop) els.drawerBackdrop.hidden = true;
+}
+
+function handleCompactLayoutChange() {
+  closeDrawers();
+  if (!els.nowPlaying) return;
+  if (compactLayoutQuery.matches) {
+    ["left", "top", "right", "bottom", "transform"].forEach((property) =>
+      els.nowPlaying.style.removeProperty(property),
+    );
+  } else {
+    restorePlayerPosition();
+  }
 }
 
 function restoreLayoutState() {
@@ -1365,6 +1417,7 @@ function renderSections() {
     button.addEventListener("click", () => {
       const firstLine = getFirstLineForSection(section);
       if (!firstLine) return;
+      closeDrawers();
       document
         .getElementById(firstLine.id)
         ?.scrollIntoView({ behavior: "smooth", block: "center" });
@@ -1390,6 +1443,7 @@ function renderSections() {
     playButton.appendChild(playIcon);
     playButton.addEventListener("click", () => {
       if (!firstLine) return;
+      closeDrawers();
       seekToLine(firstLine);
       document
         .getElementById(firstLine.id)
@@ -1422,6 +1476,7 @@ function renderSections() {
     loopButton.appendChild(loopIcon);
     loopButton.addEventListener("click", () => {
       if (!firstLine) return;
+      closeDrawers();
       toggleSectionLoop(section);
       document
         .getElementById(firstLine.id)
